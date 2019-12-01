@@ -110,3 +110,99 @@ def cost_of_solution(G, car_cycle, dropoff_mapping):
 
 def convert_locations_to_indices(list_to_convert, list_of_locations):
     return [list_of_locations.index(name) if name in list_of_locations else None for name in list_to_convert]
+
+"""
+Below are the code replicating previous code for pairwise shortest dist algorithm
+"""
+def get_shortest_dist_matrix(adjacency_matrix):
+
+    neighbors = get_neighbor_from_matrix(adjacency_matrix)
+
+    length = len(adjacency_matrix)
+    shortPath = dict()
+
+    for i in range(length):
+        shortPath[(i, i)] = 0
+
+    indirect = dict()
+    for i in range(length - 1):
+        indirect[i] = []
+        for j in range(i + 1, length):
+            if j not in neighbors[i]:
+                indirect[i].append(j)
+                shortPath[(i, j)] = float('inf')
+            else:
+                shortPath[(i, j)] = adjacency_matrix[i][j]
+    
+    for k in range(length):
+        for i in range(length - 1):
+            for j in indirect[i]:
+                if k != i and k != j:
+                    tmpDist = shortestDist(shortPath, i, k) + shortestDist(shortPath, k, j)
+                    shortPath[(i, j)] = min(shortPath[(i, j)], tmpDist)
+
+    return shortPath
+
+def shortestDist(shortPath, u, v):
+    if u is v:
+        return 0
+    elif u < v:
+        return shortPath[(u, v)]
+    else:
+        return shortPath[(v, u)]
+
+def get_neighbor_from_matrix(matrix):
+    neighbors = dict()
+    for index, row in enumerate(matrix):
+        neighbors[index] = [i for i, j in enumerate(row) if j is not 'x']
+    return neighbors
+
+def home_shortest_paths(shortPath, homeDict):
+    homePath = {}
+
+    length = len(homeDict)
+
+    for u in range(length):
+        for v in range(u, length):
+            i = homeDict[u]
+            j = homeDict[v]
+            if i < j:
+                homePath[(u, v)] = shortPath[(i, j)]
+            else:
+                homePath[(u, v)] = shortPath[(j, i)]
+    
+    return homePath
+
+"""
+Below are the codes for the polynomial-time dynamic programming algorithm for 4/3 approximation
+"""
+def p_time_dp(visit_order_list, shortPath, start_loc, matrix):
+
+    homeLength = len(visit_order_list)
+    length = len(matrix)
+
+    energy = {}
+    i = 0
+    energy[i] = {}
+    for j in range(length):
+        energy[i][j] = shortestDist(shortPath, start_loc, j)
+    
+    cache = {}
+
+    for i in range(1, homeLength + 1):
+        energy[i] = {}
+        for j in range(length):
+            energy[i][j] = float('inf')
+            for k in range(length):
+                tmp = energy[i - 1][k] + shortestDist(shortPath, j, visit_order_list[i - 1]) + 2/3 * shortestDist(shortPath, j, k)
+                if tmp < energy[i][j]:
+                    energy[i][j] = tmp
+                    cache[(i, j)] = k  
+
+    return energy[homeLength][start_loc], cache
+
+"""
+The below codes are for the final translation between indices and names
+"""
+def translate_path(finalPath, list_of_locations):
+    pass

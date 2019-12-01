@@ -4,6 +4,7 @@ sys.path.append('..')
 sys.path.append('../..')
 import argparse
 import utils
+from christofides import tsp
 
 from student_utils import *
 """
@@ -24,9 +25,42 @@ def solve(list_of_locations, list_of_homes, starting_car_location, adjacency_mat
         A list of locations representing the car path
         A dictionary mapping drop-off location to a list of homes of TAs that got off at that particular location
         NOTE: both outputs should be in terms of indices not the names of the locations themselves
-    """
-    pass
+    """ 
+    # Step 1: Construct a shortest dist matrix from adjacancy matrix
+    shortPath = get_shortest_dist_matrix(adjacency_matrix)
+    homeIndices = [list_of_locations.index(home) for home in list_of_homes]
+    homeDict = {i:j for i, j in enumerate(homeIndices)}
 
+    homeShortPath = home_shortest_paths(shortPath, homeDict)
+    length, path = tsp(homeShortPath, len(homeDict))
+
+    # translate back to homes' real locations
+    metric_tsp_path = [homeDict[p] for p in path]
+
+    # Step 2: P-time dynamic programming algorithm
+    start_loc = list_of_locations.index(starting_car_location)
+    result, cache = p_time_dp(metric_tsp_path, shortPath, start_loc, adjacency_matrix)
+
+    k = len(metric_tsp_path)
+    finalPath = [start_loc]
+    dropOffDict = {}
+    loc = start_loc
+
+    while k > 0:
+        loc = cache[(k, loc)]
+        k -= 1
+        finalPath.append(loc)
+        if k not in dropOffDict:
+            dropOffDict[k] = []
+        dropOffDict[k].append(metric_tsp_path[k])
+    
+    # actualShort = 0
+    # for i in range(len(newPath) - 1):
+    #     actualShort += shortestDist(shortPath, newPath[i], newPath[i + 1])
+    # print(actualShort)
+    
+    # Step3: translate indices back to the names
+    return finalPath, dropOffDict
 """
 ======================================================================
    No need to change any code below this line
