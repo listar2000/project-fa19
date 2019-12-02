@@ -177,7 +177,6 @@ def home_shortest_paths(shortPath, homeDict):
 Below are the codes for the polynomial-time dynamic programming algorithm for 4/3 approximation
 """
 def p_time_dp(visit_order_list, shortPath, start_loc, matrix):
-
     homeLength = len(visit_order_list)
     length = len(matrix)
 
@@ -202,7 +201,35 @@ def p_time_dp(visit_order_list, shortPath, start_loc, matrix):
     return energy[homeLength][start_loc], cache
 
 """
-The below codes are for the final translation between indices and names
+The below codes are for the final recovery of the entire path
 """
-def translate_path(finalPath, list_of_locations):
-    pass
+def recover_entire_path(dropOffLocs, adjacency_matrix):
+    # remove duplicates in dropOffLocs
+    uniqueDropOffLocs = [dropOffLocs[0]]
+    for i in range(1, len(dropOffLocs)):
+        if not dropOffLocs[i] == dropOffLocs[i - 1]:
+            uniqueDropOffLocs.append(dropOffLocs[i])
+
+    G, _ = adjacency_matrix_to_graph(adjacency_matrix)
+    i, j = 0, 1
+    recovered_path = []
+    while j < len(uniqueDropOffLocs):
+        dijkstra_path = nx.algorithms.dijkstra_path(G, uniqueDropOffLocs[i], uniqueDropOffLocs[j])
+        recovered_path += dijkstra_path[:-1]
+        i += 1
+        j += 1
+    # add the starting location at the end
+    recovered_path.append(uniqueDropOffLocs[-1])
+    return recovered_path
+
+"""
+"""
+
+def reorder_visit(metric_tsp_path: list, start_loc: int, contains_start: bool):
+    reordered_path = []
+    if contains_start:
+        reordered_path.append(start_loc)
+    headIndex = metric_tsp_path.index(start_loc) + 1
+    reordered_path.extend(metric_tsp_path[headIndex:])
+    reordered_path.extend(metric_tsp_path[:headIndex - 1])
+    return reordered_path

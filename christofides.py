@@ -30,7 +30,7 @@ def tsp(shortPath, length):
     current = eulerian_tour[0]
     path = [current]
     visited = [False] * len(eulerian_tour)
-    visited[0] = True
+    visited[current] = True
 
     length = 0
 
@@ -41,8 +41,6 @@ def tsp(shortPath, length):
 
             length += G[current][v]
             current = v
-
-    path.append(path[0])
 
     # print("Result path: ", path)
     # print("Result length of the path: ", length)

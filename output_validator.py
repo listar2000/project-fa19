@@ -90,6 +90,9 @@ def tests(input_data, output_data, params=[]):
 
     if any(home not in targets for home in list_of_houses):
         message += 'At least one student did not get home.\n'
+        for home in list_of_houses:
+            if home not in targets:
+                print("home: ", list_of_locations.index(home))
         cost = 'infinite'
 
     if (car_cycle[0] != starting_location):
