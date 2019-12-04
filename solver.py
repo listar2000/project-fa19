@@ -31,8 +31,8 @@ def solve(list_of_locations, list_of_homes, starting_car_location, adjacency_mat
     # Step 1: Construct a shortest dist matrix from adjacancy matrix
     shortPath = get_shortest_dist_matrix(adjacency_matrix)
     homeIndices = [list_of_locations.index(home) for home in list_of_homes]
-
-    if start_loc not in homeIndices:
+    flag = start_loc not in homeIndices
+    if flag:
         homeIndices.append(start_loc)
     homeDict = {i:j for i, j in enumerate(homeIndices)}
 
@@ -41,7 +41,9 @@ def solve(list_of_locations, list_of_homes, starting_car_location, adjacency_mat
 
     # translate back to homes' real locations
     metric_tsp_path = reorder_visit([homeDict[p] for p in path], start_loc, start_loc in homeIndices)
-
+    #remove the starting location from the list of homes
+    if flag:
+        metric_tsp_path.pop(0)
     # Step 2: P-time dynamic programming algorithm
     result, cache = p_time_dp(metric_tsp_path, shortPath, start_loc, adjacency_matrix)
 
@@ -94,7 +96,6 @@ def solve_from_file(input_file, output_directory, params=[]):
     input_data = utils.read_file(input_file)
     num_of_locations, num_houses, list_locations, list_houses, starting_car_location, adjacency_matrix = data_parser(input_data)
     car_path, drop_offs = solve(list_locations, list_houses, starting_car_location, adjacency_matrix, params=params)
-
     basename, filename = os.path.split(input_file)
     if not os.path.exists(output_directory):
         os.makedirs(output_directory)
@@ -114,7 +115,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Parsing arguments')
     parser.add_argument('--all', action='store_true', help='If specified, the solver is run on all files in the input directory. Else, it is run on just the given input file')
     parser.add_argument('input', type=str, help='The path to the input file or directory')
-    parser.add_argument('output_directory', type=str, nargs='?', default='.', help='The path to the directory where the output should be written')
+    parser.add_argument('output_directory', type=str, nargs='?', default='outputs', help='The path to the directory where the output should be written')
     parser.add_argument('params', nargs=argparse.REMAINDER, help='Extra arguments passed in')
     args = parser.parse_args()
     output_directory = args.output_directory
