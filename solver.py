@@ -145,12 +145,21 @@ def solve_from_file(input_file, output_directory, params=[]):
 def solve_all(input_directory, output_directory, params=[]):
     input_files = utils.get_files_with_extension(input_directory, 'in')
 
-    for input_file in input_files:
-        import time
-        t1 = time.time()
-        solve_from_file(input_file, output_directory, params=params)
-        print(time.time() - t1)
+    control = int(params[0])
 
+    for input_file in input_files:
+        if control == 3:
+            if input_file.endswith('_200.in'):
+                continue
+        else:
+            if not input_file.endswith('_200.in'):
+                continue
+            else:
+                num = int(input_file[-8])
+                if num % 3 != control:
+                    continue
+                
+        solve_from_file(input_file, output_directory, params=params)
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Parsing arguments')
@@ -166,3 +175,6 @@ if __name__=="__main__":
     else:
         input_file = args.input
         solve_from_file(input_file, output_directory, params=args.params)
+
+def parse_file_name():
+    pass
