@@ -5,6 +5,7 @@ sys.path.append('../..')
 import argparse
 import utils
 from christofides import tsp
+import time
 
 from student_utils import *
 """
@@ -40,27 +41,38 @@ def solve(list_of_locations, list_of_homes, starting_car_location, adjacency_mat
     #print("home dict is   :",homeDict)
     homeShortPath = home_shortest_paths(shortPath, homeDict)
 
+    paths, lengths = [], []
+    for i in range(10):
+        length, path = tsp(homeShortPath, len(homeDict))
+        paths.append(path)
+        lengths.append(length)
+    
+    path = paths[lengths.index(min(lengths))]
 
+    result, cache, metric_tsp_path = float('inf'), None, None
 
-    length, path = tsp(homeShortPath, len(homeDict))
+    for i in range(10):
+        length, path = lengths[i], paths[i]
+        #print("size of homeIndices is ",homeIndices.__len__()," and the list is ",homeIndices)
+        #print(flag,"length of path return by tsp is: ", length, len(path), path,start_loc)
+        # translate back to homes' real locations
+        #print(start_loc in homeIndices)
+        #print("actual path: ",path)
+        #print("homeDicts in path:",[homeDict[p] for p in path])
+        tmp_path = reorder_visit([homeDict[p] for p in path], start_loc, True)
+        #print("afer reordering: ", metric_tsp_path)
+        #remove the starting location from the list of homes
+        if flag:
+            #print("HI")
+            tmp_path.pop(0)
+            #print(metric_tsp_path)
+        # Step 2: P-time dynamic programming algorithm
+        tmp_result, tmp_cache = p_time_dp(tmp_path, shortPath, start_loc, adjacency_matrix)
+        if tmp_result < result:
+            result = tmp_result
+            cache = tmp_cache
+            metric_tsp_path = tmp_path
 
-
-
-    #print("size of homeIndices is ",homeIndices.__len__()," and the list is ",homeIndices)
-    #print(flag,"length of path return by tsp is: ", length, len(path), path,start_loc)
-    # translate back to homes' real locations
-    #print(start_loc in homeIndices)
-    #print("actual path: ",path)
-    #print("homeDicts in path:",[homeDict[p] for p in path])
-    metric_tsp_path = reorder_visit([homeDict[p] for p in path], start_loc, True)
-    #print("afer reordering: ", metric_tsp_path)
-    #remove the starting location from the list of homes
-    if flag:
-        #print("HI")
-        metric_tsp_path.pop(0)
-        #print(metric_tsp_path)
-    # Step 2: P-time dynamic programming algorithm
-    result, cache = p_time_dp(metric_tsp_path, shortPath, start_loc, adjacency_matrix)
     print("total energy",result)
     k = len(metric_tsp_path)
     finalPath = [start_loc]
@@ -134,7 +146,10 @@ def solve_all(input_directory, output_directory, params=[]):
     input_files = utils.get_files_with_extension(input_directory, 'in')
 
     for input_file in input_files:
+        import time
+        t1 = time.time()
         solve_from_file(input_file, output_directory, params=params)
+        print(time.time() - t1)
 
 
 if __name__=="__main__":
