@@ -179,12 +179,12 @@ Below are the codes for the polynomial-time dynamic programming algorithm for 4/
 def p_time_dp(visit_order_list, shortPath, start_loc, matrix):
     homeLength = len(visit_order_list)
     length = len(matrix)
-
+    #print("number of houses is ",homeLength)
     energy = {}
     i = 0
     energy[i] = {}
     for j in range(length):
-        energy[i][j] = shortestDist(shortPath, start_loc, j)
+        energy[i][j] = 2/3 *shortestDist(shortPath, start_loc, j)
     
     cache = {}
 
@@ -193,7 +193,7 @@ def p_time_dp(visit_order_list, shortPath, start_loc, matrix):
         for j in range(length):
             energy[i][j] = float('inf')
             for k in range(length):
-                tmp = energy[i - 1][k] + shortestDist(shortPath, j, visit_order_list[i - 1]) + 2/3 * shortestDist(shortPath, j, k)
+                tmp = energy[i - 1][k] + shortestDist(shortPath, k, visit_order_list[i - 1]) + 2/3 * shortestDist(shortPath, j, k)
                 if tmp < energy[i][j]:
                     energy[i][j] = tmp
                     cache[(i, j)] = k  
