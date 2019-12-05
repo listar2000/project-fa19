@@ -114,7 +114,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Parsing arguments')
     parser.add_argument('--all', action='store_true', help='If specified, the solver is run on all files in the input directory. Else, it is run on just the given input file')
     parser.add_argument('input', type=str, help='The path to the input file or directory')
-    parser.add_argument('output_directory', type=str, nargs='?', default='.', help='The path to the directory where the output should be written')
+    parser.add_argument('output_directory', type=str, nargs='?', default='outputs', help='The path to the directory where the output should be written')
     parser.add_argument('params', nargs=argparse.REMAINDER, help='Extra arguments passed in')
     args = parser.parse_args()
     output_directory = args.output_directory
