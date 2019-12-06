@@ -43,9 +43,14 @@ def solve(list_of_locations, list_of_homes, starting_car_location, adjacency_mat
 
     paths, lengths = [], []
     for i in range(10):
-        length, path = tsp(homeShortPath, len(homeDict))
-        paths.append(path)
-        lengths.append(length)
+        min_length, min_path = float('inf'), None
+        for j in range(20):
+            length, path = tsp(homeShortPath, len(homeDict))
+            if length < min_length:
+                min_length = length
+                min_path = path
+        paths.append(min_path)
+        lengths.append(min_length)
     
     path = paths[lengths.index(min(lengths))]
 
@@ -72,8 +77,7 @@ def solve(list_of_locations, list_of_homes, starting_car_location, adjacency_mat
             result = tmp_result
             cache = tmp_cache
             metric_tsp_path = tmp_path
-
-    print("total energy",result)
+    
     k = len(metric_tsp_path)
     finalPath = [start_loc]
     dropOffDict = {}
@@ -165,7 +169,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Parsing arguments')
     parser.add_argument('--all', action='store_true', help='If specified, the solver is run on all files in the input directory. Else, it is run on just the given input file')
     parser.add_argument('input', type=str, help='The path to the input file or directory')
-    parser.add_argument('output_directory', type=str, nargs='?', default='outputs', help='The path to the directory where the output should be written')
+    parser.add_argument('output_directory', type=str, nargs='?', default='outputs3', help='The path to the directory where the output should be written')
     parser.add_argument('params', nargs=argparse.REMAINDER, help='Extra arguments passed in')
     args = parser.parse_args()
     output_directory = args.output_directory
