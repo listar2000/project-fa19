@@ -152,7 +152,7 @@ def solve_all(input_directory, output_directory, params=[]):
     control = int(params[0])
 
     for input_file in input_files:
-        if control == 3:
+        if control == 2:
             if input_file.endswith('_200.in'):
                 continue
         else:
@@ -160,7 +160,7 @@ def solve_all(input_directory, output_directory, params=[]):
                 continue
             else:
                 num = int(input_file[-8])
-                if num % 3 != control:
+                if num % 2 != control:
                     continue
                 
         solve_from_file(input_file, output_directory, params=params)
@@ -169,7 +169,7 @@ if __name__=="__main__":
     parser = argparse.ArgumentParser(description='Parsing arguments')
     parser.add_argument('--all', action='store_true', help='If specified, the solver is run on all files in the input directory. Else, it is run on just the given input file')
     parser.add_argument('input', type=str, help='The path to the input file or directory')
-    parser.add_argument('output_directory', type=str, nargs='?', default='outputs3', help='The path to the directory where the output should be written')
+    parser.add_argument('output_directory', type=str, nargs='?', default='outputs', help='The path to the directory where the output should be written')
     parser.add_argument('params', nargs=argparse.REMAINDER, help='Extra arguments passed in')
     args = parser.parse_args()
     output_directory = args.output_directory
